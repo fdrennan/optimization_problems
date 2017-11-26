@@ -1,0 +1,24 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1511660422560.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "8742E549",
+    "lastKnownWriteTime" : 1511672240,
+    "last_content_update" : 1511672240605,
+    "path" : "~/Documents/programming/rProjects/optimization/Cross Optimization.Rmd",
+    "project_path" : "Cross Optimization.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "cursorPosition" : "365,87",
+        "scrollLine" : "348",
+        "tempName" : "Untitled2"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

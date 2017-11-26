@@ -1,0 +1,368 @@
+---
+title: "Cross Optimization"
+author: "Freddy R. Drennan"
+date: "November 25, 2017"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    keep_tex: yes
+    latex_engine: xelatex
+---
+---
+name: "Freddy Drennan"
+title: "Adwords Optimization"
+date: "November 25, 2017"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+    theme: cerulean
+    highlight: haddock
+    fig_align: center
+---
+
+
+<style>
+body {
+    background-color: #BCE6FF
+}
+</style>
+
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=1440881362667639";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div>
+
+<!-- Footer -->
+<header>
+<!-- <div class="container"> -->
+<div class="row">
+<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+<ul class="list-inline text-center">
+<li>
+<a href="http://fdrennan.net">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-arrow-left fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li>
+<li>
+<a href="mailto:drennanfreddy@gmail.com?Subject=Hello">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li>
+<li>
+<a href="https://www.linkedin.com/in/freddy-drennan-4a8b79aa">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li>
+<li>
+<a href="http://facebook.com/freddy.drennan">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li> 
+<li>
+<a href="http://kaggle.com/fdrennan">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-area-chart fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li> 
+<li>
+<a href="https://github.com/fdrennan">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-github fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</header>
+
+################################################
+
+
+
+
+Loading the necessary packages
+```{r, warning = FALSE, message = FALSE}
+library(tidyverse)
+library(lpSolve)
+```
+
+
+
+Starting Data: 
+```{r}
+# Revenue variables
+
+initial_data <- 
+  tibble(
+    origin  = c(
+      'search', 
+      'display', 
+      'youtube', 
+      'gmail'
+    ),
+    revenue = c(
+      225776, 
+      99292, 
+      4120, 
+      2472
+    ),
+    cost    = c(
+      8827,
+      5172,
+      833,
+      423
+    )
+  ) %>% 
+    mutate(
+      roi = (revenue - cost) / cost
+    )
+```
+
+Constraints:
+
+* Total budget for all digital ads will not exceed 15000
+* Minimum: 3000 should be spent on Display ads
+* Minimum: 400  should be spent on Social YouTube
+* Display Ads and YouTube ads must exceed 60% of total budget
+* YouTube Ads should not cost more than Gmail Ads. 
+* Minimum 1500 franchise application form. 
+
+
++ $x_1$ = Search Ads
++ $x_2$ = Display Ads
++ $x_3$ = YouTube Ads
++ $x_4$ = Gmail Ads
+
+We want to increase revenue, so the objective function should be maximized regarding the constraints. 
+
+```{r}
+A <-  
+  matrix(
+    c(
+     1,    1,    1,    1,
+     0,    1,    0,    0,
+     0,    0,    1,    0,
+  -0.6,  0.4,  0.4, -0.6,
+     0,    0,   -1,    1, 
+   .13,  .09,  .02,  .03
+    ),
+  ncol = 4,
+  byrow = TRUE
+  )
+
+b <- 
+  c(
+    15000,
+    3000,
+    400,
+    0,
+    0,
+    1500
+  )
+
+dir <- 
+c(
+  "<=",
+  ">=",
+  ">=",
+  ">=",
+  ">=",
+  ">="
+)
+
+obj <- 
+  c(
+    initial_data$roi
+  )
+```
+
+$$
+\text{max}\:\:(x_1 + x_2 + x_3 + x_4)
+$$
+
+```{r}
+cbind(A, dir, b) %>% 
+  noquote() 
+```
+
+```{r}
+s = lp(
+  "max", # Maximize or minimize function
+  obj,   # Objective function to maximize
+  A,     # constraint matrix
+  dir,   # direction of equalities
+  b      # b vector of constraint coeffs
+)
+
+solution <- 
+  s$solution
+
+names(solution) <- 
+  initial_data %>% 
+  pull(origin) %>% 
+  paste0("Budget-", .)
+
+solution
+```
+
+
+```{r}
+A %*% solution %>% 
+  round(2)
+```
+
+
+Cleaning up data to display
+```{r}
+
+sol_tib <- 
+  tibble(
+  x_1 = rep(NA, 6),
+  x_2 = rep(NA, 6),
+  x_3 = rep(NA, 6),
+  x_4 = rep(NA, 6)
+)
+
+for(i in 1:nrow(A)) {
+  solz <- 
+    paste0(A[i,], " * ", solution, " + ") %>% 
+    noquote 
+  
+  sol_tib[i, 1:4] <- 
+    solz
+}
+
+sol_tib <-
+  sol_tib %>% 
+  mutate(
+    equals            = rep("=", 6),
+    sol               = A%*%solution %>% round(2),
+    x_4               = sub("\\+", "", x_4) %>% str_trim,
+    'constraints==>'  = rep("...", 6),
+    dir               = dir,
+    b                 = b
+  ) %>% 
+  as.data.frame
+
+  
+sol_tib
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##############################################
+<div>
+
+<!-- Footer -->
+<header>
+<!-- <div class="container"> -->
+<div class="row">
+<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+<ul class="list-inline text-center">
+<li>
+<a href="http://fdrennan.net">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-arrow-left fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li>
+<li>
+<a href="mailto:drennanfreddy@gmail.com?Subject=Hello">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li>
+<li>
+<a href="https://www.linkedin.com/in/freddy-drennan-4a8b79aa">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li>
+<li>
+<a href="http://facebook.com/freddy.drennan">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li> 
+<li>
+<a href="http://kaggle.com/fdrennan">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-area-chart fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li> 
+<li>
+<a href="https://github.com/fdrennan">
+<span class="fa-stack fa-lg">
+<i class="fa fa-circle fa-stack-2x"></i>
+<i class="fa fa-github fa-stack-1x fa-inverse"></i>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</header>
+
+<div class="fb-comments" data-href="http://fdrennan.net/pages/pages2/Cross_Optimization.html" data-numposts="5"></div>
+
+

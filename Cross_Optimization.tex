@@ -1,0 +1,356 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Cross Optimization},
+            pdfauthor={Freddy R. Drennan},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+  \title{Cross Optimization}
+  \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+  \author{Freddy R. Drennan}
+  \preauthor{\centering\large\emph}
+  \postauthor{\par}
+  \predate{\centering\large\emph}
+  \postdate{\par}
+  \date{November 25, 2017}
+
+
+\begin{document}
+\maketitle
+
+Loading the necessary packages
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyverse)}
+\KeywordTok{library}\NormalTok{(lpSolve)}
+\end{Highlighting}
+\end{Shaded}
+
+Starting Data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Revenue variables}
+
+\NormalTok{initial_data <-}\StringTok{ }
+\StringTok{  }\KeywordTok{tibble}\NormalTok{(}
+    \DataTypeTok{origin  =} \KeywordTok{c}\NormalTok{(}
+      \StringTok{'search'}\NormalTok{, }
+      \StringTok{'display'}\NormalTok{, }
+      \StringTok{'youtube'}\NormalTok{, }
+      \StringTok{'gmail'}
+\NormalTok{    ),}
+    \DataTypeTok{revenue =} \KeywordTok{c}\NormalTok{(}
+      \DecValTok{225776}\NormalTok{, }
+      \DecValTok{99292}\NormalTok{, }
+      \DecValTok{4120}\NormalTok{, }
+      \DecValTok{2472}
+\NormalTok{    ),}
+    \DataTypeTok{cost    =} \KeywordTok{c}\NormalTok{(}
+      \DecValTok{8827}\NormalTok{,}
+      \DecValTok{5172}\NormalTok{,}
+      \DecValTok{833}\NormalTok{,}
+      \DecValTok{423}
+\NormalTok{    )}
+\NormalTok{  ) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{    }\KeywordTok{mutate}\NormalTok{(}
+      \DataTypeTok{roi =}\NormalTok{ (revenue }\OperatorTok{-}\StringTok{ }\NormalTok{cost) }\OperatorTok{/}\StringTok{ }\NormalTok{cost}
+\NormalTok{    )}
+\end{Highlighting}
+\end{Shaded}
+
+Constraints:
+
+\begin{itemize}
+\item
+  Total budget for all digital ads will not exceed 15000
+\item
+  Minimum: 3000 should be spent on Display ads
+\item
+  Minimum: 400 should be spent on Social YouTube
+\item
+  Display Ads and YouTube ads must exceed 60\% of total budget
+\item
+  YouTube Ads should not cost more than Gmail Ads.
+\item
+  Minimum 1500 franchise application form.
+\item
+  \(x_1\) = Search Ads
+\item
+  \(x_2\) = Display Ads
+\item
+  \(x_3\) = YouTube Ads
+\item
+  \(x_4\) = Gmail Ads
+\end{itemize}
+
+We want to increase revenue, so the objective function should be
+maximized regarding the constraints.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{A <-}\StringTok{  }
+\StringTok{  }\KeywordTok{matrix}\NormalTok{(}
+    \KeywordTok{c}\NormalTok{(}
+     \DecValTok{1}\NormalTok{,    }\DecValTok{1}\NormalTok{,    }\DecValTok{1}\NormalTok{,    }\DecValTok{1}\NormalTok{,}
+     \DecValTok{0}\NormalTok{,    }\DecValTok{1}\NormalTok{,    }\DecValTok{0}\NormalTok{,    }\DecValTok{0}\NormalTok{,}
+     \DecValTok{0}\NormalTok{,    }\DecValTok{0}\NormalTok{,    }\DecValTok{1}\NormalTok{,    }\DecValTok{0}\NormalTok{,}
+  \OperatorTok{-}\FloatTok{0.6}\NormalTok{,  }\FloatTok{0.4}\NormalTok{,  }\FloatTok{0.4}\NormalTok{, }\OperatorTok{-}\FloatTok{0.6}\NormalTok{,}
+     \DecValTok{0}\NormalTok{,    }\DecValTok{0}\NormalTok{,   }\OperatorTok{-}\DecValTok{1}\NormalTok{,    }\DecValTok{1}\NormalTok{, }
+\NormalTok{   .}\DecValTok{13}\NormalTok{,  .}\DecValTok{09}\NormalTok{,  .}\DecValTok{02}\NormalTok{,  .}\DecValTok{03}
+\NormalTok{    ),}
+  \DataTypeTok{ncol =} \DecValTok{4}\NormalTok{,}
+  \DataTypeTok{byrow =} \OtherTok{TRUE}
+\NormalTok{  )}
+
+\NormalTok{b <-}\StringTok{ }
+\StringTok{  }\KeywordTok{c}\NormalTok{(}
+    \DecValTok{15000}\NormalTok{,}
+    \DecValTok{3000}\NormalTok{,}
+    \DecValTok{400}\NormalTok{,}
+    \DecValTok{0}\NormalTok{,}
+    \DecValTok{0}\NormalTok{,}
+    \DecValTok{1500}
+\NormalTok{  )}
+
+\NormalTok{dir <-}\StringTok{ }
+\KeywordTok{c}\NormalTok{(}
+  \StringTok{"<="}\NormalTok{,}
+  \StringTok{">="}\NormalTok{,}
+  \StringTok{">="}\NormalTok{,}
+  \StringTok{">="}\NormalTok{,}
+  \StringTok{">="}\NormalTok{,}
+  \StringTok{">="}
+\NormalTok{)}
+
+\NormalTok{obj <-}\StringTok{ }
+\StringTok{  }\KeywordTok{c}\NormalTok{(}
+\NormalTok{    initial_data}\OperatorTok{$}\NormalTok{roi}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\[
+\text{max}\:\:(x_1 + x_2 + x_3 + x_4)
+\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cbind}\NormalTok{(A, dir, b) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{noquote}\NormalTok{() }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                          dir b    
+## [1,] 1    1    1    1    <=  15000
+## [2,] 0    1    0    0    >=  3000 
+## [3,] 0    0    1    0    >=  400  
+## [4,] -0.6 0.4  0.4  -0.6 >=  0    
+## [5,] 0    0    -1   1    >=  0    
+## [6,] 0.13 0.09 0.02 0.03 >=  1500
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{s =}\StringTok{ }\KeywordTok{lp}\NormalTok{(}\StringTok{"max"}\NormalTok{, obj, A, dir, b)}
+
+\NormalTok{solution <-}\StringTok{ }
+\StringTok{  }\NormalTok{s}\OperatorTok{$}\NormalTok{solution}
+
+\KeywordTok{names}\NormalTok{(solution) <-}\StringTok{ }
+\StringTok{  }\NormalTok{initial_data }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{pull}\NormalTok{(origin) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{paste0}\NormalTok{(}\StringTok{"Budget-"}\NormalTok{, .)}
+
+\NormalTok{solution}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  Budget-search Budget-display Budget-youtube   Budget-gmail 
+##           5600           8600            400            400
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{A }\OperatorTok{%*%}\StringTok{ }\NormalTok{solution }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{round}\NormalTok{(}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       [,1]
+## [1,] 15000
+## [2,]  8600
+## [3,]   400
+## [4,]     0
+## [5,]     0
+## [6,]  1522
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sol_tib <-}\StringTok{ }
+\StringTok{  }\KeywordTok{tibble}\NormalTok{(}
+  \DataTypeTok{x_1 =} \KeywordTok{rep}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\DecValTok{6}\NormalTok{),}
+  \DataTypeTok{x_2 =} \KeywordTok{rep}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\DecValTok{6}\NormalTok{),}
+  \DataTypeTok{x_3 =} \KeywordTok{rep}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\DecValTok{6}\NormalTok{),}
+  \DataTypeTok{x_4 =} \KeywordTok{rep}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\DecValTok{6}\NormalTok{)}
+\NormalTok{)}
+
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(A)) \{}
+\NormalTok{  solz <-}\StringTok{ }
+\StringTok{    }\KeywordTok{paste0}\NormalTok{(A[i,], }\StringTok{" * "}\NormalTok{, solution, }\StringTok{" + "}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{    }\NormalTok{noquote }
+  
+\NormalTok{  sol_tib[i, }\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{] <-}\StringTok{ }
+\StringTok{    }\NormalTok{solz}
+\NormalTok{\}}
+
+\NormalTok{sol_tib <-}
+\StringTok{  }\NormalTok{sol_tib }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}
+    \DataTypeTok{equals            =} \KeywordTok{rep}\NormalTok{(}\StringTok{"="}\NormalTok{, }\DecValTok{6}\NormalTok{),}
+    \DataTypeTok{sol               =}\NormalTok{ A}\OperatorTok{%*%}\NormalTok{solution }\OperatorTok{%>%}\StringTok{ }\KeywordTok{round}\NormalTok{(}\DecValTok{2}\NormalTok{),}
+    \DataTypeTok{x_4               =} \KeywordTok{sub}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{+"}\NormalTok{, }\StringTok{""}\NormalTok{, x_}\DecValTok{4}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\NormalTok{str_trim,}
+    \StringTok{'constraints==>'}\NormalTok{  =}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\StringTok{"..."}\NormalTok{, }\DecValTok{6}\NormalTok{),}
+    \DataTypeTok{dir               =}\NormalTok{ dir,}
+    \DataTypeTok{b                 =}\NormalTok{ b}
+\NormalTok{  ) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\NormalTok{as.data.frame}
+
+  
+\NormalTok{sol_tib}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##              x_1            x_2           x_3        x_4 equals   sol
+## 1    1 * 5600 +     1 * 8600 +     1 * 400 +     1 * 400      = 15000
+## 2    0 * 5600 +     1 * 8600 +     0 * 400 +     0 * 400      =  8600
+## 3    0 * 5600 +     0 * 8600 +     1 * 400 +     0 * 400      =   400
+## 4 -0.6 * 5600 +   0.4 * 8600 +   0.4 * 400 +  -0.6 * 400      =     0
+## 5    0 * 5600 +     0 * 8600 +    -1 * 400 +     1 * 400      =     0
+## 6 0.13 * 5600 +  0.09 * 8600 +  0.02 * 400 +  0.03 * 400      =  1522
+##   constraints==> dir     b
+## 1            ...  <= 15000
+## 2            ...  >=  3000
+## 3            ...  >=   400
+## 4            ...  >=     0
+## 5            ...  >=     0
+## 6            ...  >=  1500
+\end{verbatim}
+
+
+\end{document}

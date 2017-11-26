@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1511661339393.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "50BE7EDB",
+    "lastKnownWriteTime" : 1511576771,
+    "last_content_update" : 1511576771,
+    "path" : "~/Documents/programming/rProjects/optimization/healthcare.R",
+    "project_path" : "healthcare.R",
+    "properties" : {
+        "cursorPosition" : "131,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
